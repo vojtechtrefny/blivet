@@ -208,7 +208,6 @@ class LVMRaidTestCase(BlivetResetTestCase):
         self.collect_expected_data()
 
 
-@unittest.skip("temporarily disabled due to mdadm issues")
 class MDRaid0TestCase(BlivetResetTestCase):
 
     """ Verify correct detection of MD RAID0 arrays. """
@@ -220,13 +219,6 @@ class MDRaid0TestCase(BlivetResetTestCase):
                 getattr(device, "metadata_version", "").startswith("0.9"))
 
     def _set_up_storage(self):
-        device = self.blivet.factory_device(devicefactory.DEVICE_TYPE_MD,
-                                            Size("200 MiB"),
-                                            disks=self.blivet.disks[:],
-                                            raid_level=self.level,
-                                            label="v090",
-                                            name="2")
-        device.metadata_version = "0.90"
 
         device = self.blivet.factory_device(devicefactory.DEVICE_TYPE_MD,
                                             Size("200 MiB"),
@@ -260,7 +252,6 @@ class MDRaid0TestCase(BlivetResetTestCase):
                                             name="default")
 
 
-@unittest.skip("temporarily disabled due to mdadm issues")
 class LVMOnMDTestCase(BlivetResetTestCase):
     # This also tests raid1 with the default metadata version.
 
