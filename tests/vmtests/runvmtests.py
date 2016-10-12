@@ -130,6 +130,13 @@ def run_tests(cmd_args):
                                        (cmd_args.branch, stdout.read().decode("utf-8"),
                                         stderr.read().decode("utf-8")))
 
+                # install blivet
+                _stdin, stdout, stderr = ssh.exec_command("cd blivet && sudo python3 setup.py install")
+                if stdout.channel.recv_exit_status() != 0:
+                    raise RuntimeError("Failed to install Blivet %s.\nOutput:\n%s\n%s" %
+                                       (cmd_args.branch, stdout.read().decode("utf-8"),
+                                        stderr.read().decode("utf-8")))
+
                 # run the tests
                 cmd = "export VM_ENVIRONMENT=1 && cd blivet && \
                        PYTHONPATH=. python3 -m unittest %s" % test
