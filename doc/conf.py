@@ -18,6 +18,7 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(1, os.path.abspath('.'))
 
 # -- General configuration -----------------------------------------------------
 
@@ -293,3 +294,25 @@ epub_copyright = u'2013, David Lehman'
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/3': None}
+
+# copied from http://read-the-docs.readthedocs.io/en/latest/faq.html#i-get-import-errors-on-libraries-that-depend-on-c-modules
+from unittest.mock import MagicMock
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
+MOCK_MODULES = ['parted', 'pykickstart', 'pykickstart.constants', 'pykickstart.version', '_ped', 'selinux', 'pyudev', 'gi', 'gi.repository', 'bytesize', 'bytesize.bytesize', 'hawkey']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
+# autodoc_mock_imports = ['parted', 'pykickstart', 'pykickstart.constants', '_ped', 'selinux', 'pyudev', 'gi', 'gi.repository']
+
+# run the makefile to generate/update the generated parts of the docs
+# if sphinx has not been started from the makefile
+# (this usually happens during a Read the Docs build)
+if not os.environ.get("STARTED_FROM_MAKEFILE") == "1":
+    print("The makefile needs to be run first.")
+    print("running the makefile")
+    os.system("make apidoc SPHINXBUILD=sphinx-build SPHINXAPIDOC=sphinx-apidoc")
+print("makefile done")

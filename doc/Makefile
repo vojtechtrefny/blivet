@@ -3,7 +3,7 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = sphinx-build-3
+SPHINXBUILD   = STARTED_FROM_MAKEFILE=1 sphinx-build-3
 SPHINXAPIDOC  = sphinx-apidoc-3
 PAPER         =
 BUILDDIR      = _build
@@ -46,8 +46,8 @@ clean:
 	-rm -rf ./blivet
 
 apidoc:
-	$(SPHINXAPIDOC) -o ./tests $(TESTDIR)
-	$(SPHINXAPIDOC) -o ./blivet $(SOURCEDIR)
+	$(SPHINXAPIDOC) -T -e -o ./tests $(TESTDIR) --force
+	$(SPHINXAPIDOC) -T -e -o ./blivet $(SOURCEDIR) --force
 
 html: apidoc
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
