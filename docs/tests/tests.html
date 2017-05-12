@@ -6,32 +6,48 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>tests package &mdash; Blivet 2.0.0 documentation</title>
+    <title>tests package &#8212; Blivet 2.1.8 documentation</title>
     
-    <link rel="stylesheet" href="../static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.1.8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
-    <script type="text/javascript" src="../static/jquery.js"></script>
-    <script type="text/javascript" src="../static/underscore.js"></script>
-    <script type="text/javascript" src="../static/doctools.js"></script>
-    <link rel="top" title="Blivet 2.0.0 documentation" href="../index.html" />
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="tests.devicelibs_test package" href="tests.devicelibs_test.html" />
-    <link rel="prev" title="blivet.tasks package" href="../blivet/blivet.tasks.html" />
-   
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
-
+    <link rel="prev" title="blivet.tasks package" href="../blivet/blivet.tasks.html" /> 
   </head>
-  <body role="document">  
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tests.devicelibs_test.html" title="tests.devicelibs_test package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../blivet/blivet.tasks.html" title="blivet.tasks package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Blivet 2.1.8 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -55,13 +71,16 @@
 <li class="toctree-l1"><a class="reference internal" href="tests.devices_test.html">tests.devices_test package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="tests.devices_test.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.devices_test.html#module-tests.devices_test.dependencies_test">tests.devices_test.dependencies_test module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.devices_test.html#module-tests.devices_test.device_methods_test">tests.devices_test.device_methods_test module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.devices_test.html#module-tests.devices_test.device_names_test">tests.devices_test.device_names_test module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.devices_test.html#module-tests.devices_test.device_packages_test">tests.devices_test.device_packages_test module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.devices_test.html#module-tests.devices_test.device_properties_test">tests.devices_test.device_properties_test module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.devices_test.html#module-tests.devices_test.lvm_test">tests.devices_test.lvm_test module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.devices_test.html#module-tests.devices_test.md_test">tests.devices_test.md_test module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.devices_test.html#module-tests.devices_test.network_test">tests.devices_test.network_test module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.devices_test.html#module-tests.devices_test.partition_test">tests.devices_test.partition_test module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.devices_test.html#module-tests.devices_test.size_test">tests.devices_test.size_test module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.devices_test.html#module-tests.devices_test.tags_test">tests.devices_test.tags_test module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.devices_test.html#module-tests.devices_test">Module contents</a></li>
 </ul>
 </li>
@@ -75,6 +94,7 @@
 <li class="toctree-l2"><a class="reference internal" href="tests.formats_test.html#module-tests.formats_test.init_test">tests.formats_test.init_test module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.formats_test.html#module-tests.formats_test.labeling_test">tests.formats_test.labeling_test module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.formats_test.html#module-tests.formats_test.luks_test">tests.formats_test.luks_test module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.formats_test.html#module-tests.formats_test.methods_test">tests.formats_test.methods_test module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.formats_test.html#module-tests.formats_test.misc_test">tests.formats_test.misc_test module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.formats_test.html#module-tests.formats_test.selinux_test">tests.formats_test.selinux_test module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.formats_test.html#module-tests.formats_test">Module contents</a></li>
@@ -154,10 +174,10 @@ not have a method with the specified name.</p>
 <dt id="tests.action_test.DeviceActionTestCase.test_actions">
 <code class="descname">test_actions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.action_test.DeviceActionTestCase.test_actions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Verify correct management of actions.</p>
-<ul>
+<ul class="simple">
 <li><dl class="first docutils">
 <dt>action creation/registration/cancellation</dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>ActionCreateDevice adds device to tree</li>
 <li>ActionDestroyDevice removes device from tree</li>
 <li>ActionCreateFormat sets device.format in tree</li>
@@ -175,7 +195,7 @@ not have a method with the specified name.</p>
 <dd><ul class="first last">
 <li><dl class="first docutils">
 <dt>non-existent-device create..destroy cycles removed</dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>all actions on this device should get removed</li>
 </ul>
 </dd>
@@ -183,7 +203,7 @@ not have a method with the specified name.</p>
 </li>
 <li><dl class="first docutils">
 <dt>all actions pruned from to-be-destroyed devices</dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>resize, format, &amp;c</li>
 </ul>
 </dd>
@@ -191,7 +211,7 @@ not have a method with the specified name.</p>
 </li>
 <li><dl class="first docutils">
 <dt>redundant resize/format actions pruned</dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>last one registered stays</li>
 </ul>
 </dd>
@@ -204,11 +224,10 @@ not have a method with the specified name.</p>
 <li><dl class="first docutils">
 <dt>action sorting</dt>
 <dd><ul class="first last">
-<li><p class="first">destroy..resize..create</p>
-</li>
+<li>destroy..resize..create</li>
 <li><dl class="first docutils">
 <dt>creation</dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>leaves-last, including formatting</li>
 </ul>
 </dd>
@@ -216,7 +235,7 @@ not have a method with the specified name.</p>
 </li>
 <li><dl class="first docutils">
 <dt>destruction</dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>leaves-first</li>
 </ul>
 </dd>
@@ -233,6 +252,31 @@ not have a method with the specified name.</p>
 <dt id="tests.action_test.DeviceActionTestCase.test_container_actions">
 <code class="descname">test_container_actions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.action_test.DeviceActionTestCase.test_container_actions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.action_test.DeviceActionTestCase.test_lv_from_lvs_actions">
+<code class="descname">test_lv_from_lvs_actions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.action_test.DeviceActionTestCase.test_lv_from_lvs_actions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tests.blivet_test">
+<span id="tests-blivet-test-module"></span><h2>tests.blivet_test module<a class="headerlink" href="#module-tests.blivet_test" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tests.blivet_test.BlivetTestCase">
+<em class="property">class </em><code class="descclassname">tests.blivet_test.</code><code class="descname">BlivetTestCase</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.blivet_test.BlivetTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>Define tests for the Blivet class</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p>
+<dl class="method">
+<dt id="tests.blivet_test.BlivetTestCase.test_bootloader_in_kickstart">
+<code class="descname">test_bootloader_in_kickstart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.blivet_test.BlivetTestCase.test_bootloader_in_kickstart" title="Permalink to this definition">¶</a></dt>
+<dd><p>test that a bootloader such as prepboot/biosboot shows up
+in the kickstart data</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -496,6 +540,36 @@ not have a method with the specified name.</p>
 method when executed. Raises a ValueError if the instance does
 not have a method with the specified name.</p>
 <dl class="method">
+<dt id="tests.devicetree_test.DeviceTreeTestCase.test_add_device">
+<code class="descname">test_add_device</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.devicetree_test.DeviceTreeTestCase.test_add_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.devicetree_test.DeviceTreeTestCase.test_get_device_by_name">
+<code class="descname">test_get_device_by_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.devicetree_test.DeviceTreeTestCase.test_get_device_by_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.devicetree_test.DeviceTreeTestCase.test_hide_ignored_disks">
+<code class="descname">test_hide_ignored_disks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.devicetree_test.DeviceTreeTestCase.test_hide_ignored_disks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.devicetree_test.DeviceTreeTestCase.test_recursive_remove">
+<code class="descname">test_recursive_remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.devicetree_test.DeviceTreeTestCase.test_recursive_remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.devicetree_test.DeviceTreeTestCase.test_remove_device">
+<code class="descname">test_remove_device</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.devicetree_test.DeviceTreeTestCase.test_remove_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.devicetree_test.DeviceTreeTestCase.test_reset">
+<code class="descname">test_reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.devicetree_test.DeviceTreeTestCase.test_reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="tests.devicetree_test.DeviceTreeTestCase.test_resolve_device">
 <code class="descname">test_resolve_device</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.devicetree_test.DeviceTreeTestCase.test_resolve_device" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -725,8 +799,8 @@ sets them up, and tears them down again.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>device_spec</strong> (<em>list of Size or NoneType</em>) &#8211; list containing the size of each loop device</li>
-<li><strong>block_size</strong> (<em>Size or NoneType</em>) &#8211; block size for dd command when making devices</li>
+<li><strong>device_spec</strong> (<em>list of Size</em><em> or </em><em>NoneType</em>) &#8211; list containing the size of each loop device</li>
+<li><strong>block_size</strong> (<a class="reference internal" href="../blivet/blivet.html#blivet.size.Size" title="blivet.size.Size"><em>Size</em></a><em> or </em><em>NoneType</em>) &#8211; block size for dd command when making devices</li>
 </ul>
 </td>
 </tr>
@@ -759,9 +833,9 @@ sets them up, and tears them down again.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the name of the free loop device</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.5)">str</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#OSError" title="(in Python v3.5)">OSError</a>:</th><td class="field-body">on failure</td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#OSError" title="(in Python v3.6)"><strong>OSError</strong></a> &#8211; on failure</td>
 </tr>
 </tbody>
 </table>
@@ -776,8 +850,8 @@ sets them up, and tears them down again.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>device_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) &#8211; the path of the loop device</li>
-<li><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) &#8211; the path of the backing file</li>
+<li><strong>device_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the path of the loop device</li>
+<li><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the path of the backing file</li>
 </ul>
 </td>
 </tr>
@@ -794,9 +868,9 @@ sets them up, and tears them down again.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.5)"><em>str</em></a>) &#8211; the path of the backing file</li>
-<li><strong>num_blocks</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) &#8211; the size of file_name in number of blocks</li>
-<li><strong>block_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.5)"><em>int</em></a>) &#8211; the number of bytes in a block</li>
+<li><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the path of the backing file</li>
+<li><strong>num_blocks</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the size of file_name in number of blocks</li>
+<li><strong>block_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the number of bytes in a block</li>
 </ul>
 </td>
 </tr>
@@ -835,6 +909,20 @@ not have a method with the specified name.</p>
 </div>
 <div class="section" id="module-tests.partitioning_test">
 <span id="tests-partitioning-test-module"></span><h2>tests.partitioning_test module<a class="headerlink" href="#module-tests.partitioning_test" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tests.partitioning_test.DiskTagsTestCase">
+<em class="property">class </em><code class="descclassname">tests.partitioning_test.</code><code class="descname">DiskTagsTestCase</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.partitioning_test.DiskTagsTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p>
+<dl class="method">
+<dt id="tests.partitioning_test.DiskTagsTestCase.test_disk_tags">
+<code class="descname">test_disk_tags</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.partitioning_test.DiskTagsTestCase.test_disk_tags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="class">
 <dt id="tests.partitioning_test.ExtendedPartitionTestCase">
 <em class="property">class </em><code class="descclassname">tests.partitioning_test.</code><code class="descname">ExtendedPartitionTestCase</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.partitioning_test.ExtendedPartitionTestCase" title="Permalink to this definition">¶</a></dt>
@@ -956,6 +1044,11 @@ not have a method with the specified name.</p>
 <p>Create an instance of the class that will use the named test
 method when executed. Raises a ValueError if the instance does
 not have a method with the specified name.</p>
+<dl class="attribute">
+<dt id="tests.populator_test.BootFormatPopulatorTestCase.name_mismatch_ok">
+<code class="descname">name_mismatch_ok</code><em class="property"> = True</em><a class="headerlink" href="#tests.populator_test.BootFormatPopulatorTestCase.name_mismatch_ok" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="tests.populator_test.BootFormatPopulatorTestCase.test_get_helper">
 <code class="descname">test_get_helper</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.populator_test.BootFormatPopulatorTestCase.test_get_helper" title="Permalink to this definition">¶</a></dt>
@@ -1094,6 +1187,20 @@ not have a method with the specified name.</p>
 <dt id="tests.populator_test.Ext4PopulatorTestCase.udev_type">
 <code class="descname">udev_type</code><em class="property"> = 'ext4'</em><a class="headerlink" href="#tests.populator_test.Ext4PopulatorTestCase.udev_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tests.populator_test.FakePartedPart">
+<em class="property">class </em><code class="descclassname">tests.populator_test.</code><code class="descname">FakePartedPart</code><span class="sig-paren">(</span><em>partition</em>, <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.populator_test.FakePartedPart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Fake parted_partition for testing the parted partition name
+matching stuff. Has to provide size also.</p>
+<dl class="method">
+<dt id="tests.populator_test.FakePartedPart.getLength">
+<code class="descname">getLength</code><span class="sig-paren">(</span><em>unit</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.populator_test.FakePartedPart.getLength" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is circular, but works okay.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -1335,6 +1442,11 @@ not have a method with the specified name.</p>
 <code class="descname">helper_class</code><a class="headerlink" href="#tests.populator_test.MacEFIFormatPopulatorTestCase.helper_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">MacEFIFormatPopulator</span></code></p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="tests.populator_test.MacEFIFormatPopulatorTestCase.name_mismatch_ok">
+<code class="descname">name_mismatch_ok</code><em class="property"> = False</em><a class="headerlink" href="#tests.populator_test.MacEFIFormatPopulatorTestCase.name_mismatch_ok" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -1822,6 +1934,34 @@ not have a method with the specified name.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-tests.unsupported_disklabel_test">
+<span id="tests-unsupported-disklabel-test-module"></span><h2>tests.unsupported_disklabel_test module<a class="headerlink" href="#module-tests.unsupported_disklabel_test" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tests.unsupported_disklabel_test.UnsupportedDiskLabelTestCase">
+<em class="property">class </em><code class="descclassname">tests.unsupported_disklabel_test.</code><code class="descname">UnsupportedDiskLabelTestCase</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.unsupported_disklabel_test.UnsupportedDiskLabelTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p>
+<dl class="method">
+<dt id="tests.unsupported_disklabel_test.UnsupportedDiskLabelTestCase.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.unsupported_disklabel_test.UnsupportedDiskLabelTestCase.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.unsupported_disklabel_test.UnsupportedDiskLabelTestCase.test_recursive_remove">
+<code class="descname">test_recursive_remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.unsupported_disklabel_test.UnsupportedDiskLabelTestCase.test_recursive_remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tests.unsupported_disklabel_test.UnsupportedDiskLabelTestCase.test_unsupported_disklabel">
+<code class="descname">test_unsupported_disklabel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.unsupported_disklabel_test.UnsupportedDiskLabelTestCase.test_unsupported_disklabel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test behavior of partitions on unsupported disklabels.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-tests.util_test">
 <span id="tests-util-test-module"></span><h2>tests.util_test module<a class="headerlink" href="#module-tests.util_test" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -1851,7 +1991,7 @@ not have a method with the specified name.</p>
 <dl class="class">
 <dt id="tests.util_test.Test">
 <em class="property">class </em><code class="descclassname">tests.util_test.</code><code class="descname">Test</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#tests.util_test.Test" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.5)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <dl class="attribute">
 <dt id="tests.util_test.Test.bad_news">
 <code class="descname">bad_news</code><a class="headerlink" href="#tests.util_test.Test.bad_news" title="Permalink to this definition">¶</a></dt>
@@ -1935,6 +2075,7 @@ not have a method with the specified name.</p>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-tests.action_test">tests.action_test module</a></li>
+<li><a class="reference internal" href="#module-tests.blivet_test">tests.blivet_test module</a></li>
 <li><a class="reference internal" href="#module-tests.clearpart_test">tests.clearpart_test module</a></li>
 <li><a class="reference internal" href="#module-tests.devicefactory_test">tests.devicefactory_test module</a></li>
 <li><a class="reference internal" href="#module-tests.devicetree_test">tests.devicetree_test module</a></li>
@@ -1949,58 +2090,61 @@ not have a method with the specified name.</p>
 <li><a class="reference internal" href="#module-tests.storagetestcase">tests.storagetestcase module</a></li>
 <li><a class="reference internal" href="#module-tests.tsort_test">tests.tsort_test module</a></li>
 <li><a class="reference internal" href="#module-tests.udev_test">tests.udev_test module</a></li>
+<li><a class="reference internal" href="#module-tests.unsupported_disklabel_test">tests.unsupported_disklabel_test module</a></li>
 <li><a class="reference internal" href="#module-tests.util_test">tests.util_test module</a></li>
 <li><a class="reference internal" href="#module-tests">Module contents</a></li>
 </ul>
 </li>
 </ul>
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="../blivet/blivet.tasks.html" title="previous chapter">blivet.tasks package</a></li>
-      <li>Next: <a href="tests.devicelibs_test.html" title="next chapter">tests.devicelibs_test package</a></li>
-  </ul></li>
-</ul>
-</div>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../blivet/blivet.tasks.html"
+                        title="previous chapter">blivet.tasks package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tests.devicelibs_test.html"
+                        title="next chapter">tests.devicelibs_test package</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../sources/tests/tests.txt"
+      <li><a href="../_sources/tests/tests.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2013-2016, Red Hat, Inc..
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
-      
-      |
-      <a href="../sources/tests/tests.txt"
-          rel="nofollow">Page source</a>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tests.devicelibs_test.html" title="tests.devicelibs_test package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../blivet/blivet.tasks.html" title="blivet.tasks package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Blivet 2.1.8 documentation</a> &#187;</li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013-2016, Red Hat, Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
   </body>
 </html>
