@@ -121,7 +121,8 @@ def run_tests(cmd_args):
                 # clone the repository with tests
                 _stdin, stdout, stderr = ssh.exec_command("git clone %s" % cmd_args.repo)
                 if stdout.channel.recv_exit_status() != 0:
-                    raise RuntimeError("Failed to clone test repository.")
+                    raise RuntimeError("Failed to clone test repository.\nOutput:\n%s\n%s" %
+                                       (stdout.read().decode("utf-8"), stderr.read().decode("utf-8")))
 
                 # switch to selected branch
                 _stdin, stdout, stderr = ssh.exec_command("cd blivet && git checkout %s" % cmd_args.branch)
