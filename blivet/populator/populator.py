@@ -410,7 +410,7 @@ class PopulatorMixin(object):
         parted.register_exn_handler(parted_exn_handler)
         try:
             self._populate()
-        except Exception:
+        except Exception:  # pylint: disable=try-except-raise
             raise
         finally:
             parted.clear_exn_handler()
