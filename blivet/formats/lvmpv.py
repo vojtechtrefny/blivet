@@ -124,6 +124,18 @@ class LVMPhysicalVolume(DeviceFormat):
         # -f|--force or -y|--yes may be required
         blockdev.lvm.pvcreate(self.device, data_alignment=self.data_alignment)
 
+    def _pre_destroy(self, **kwargs):
+        super(LVMPhysicalVolume, self)._pre_destroy(**kwargs)
+
+        # XXX this PV is part of an existing VG but we don't know it probably
+        # because it is hidden -- we need to deactivate it first
+        pv_info = blockdev.lvm.pvinfo(self.device)
+        if pv_info.vg_name:
+            try:
+                blockdev.lvm.vgdeactivate(pv_info.vg_name)
+            except blockdev.LVMError:
+                log.warning("Failed to deactivate vg '%s' before pvremove", pv_info.vgname)
+
     def _destroy(self, **kwargs):
         log_method_call(self, device=self.device,
                         type=self.type, status=self.status)
