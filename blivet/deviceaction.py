@@ -160,10 +160,19 @@ class DeviceAction(util.ObjectID):
         if not isinstance(device, StorageDevice):
             raise ValueError("arg 1 must be a StorageDevice instance")
 
-        unavailable_dependencies = device.unavailable_dependencies
-        if unavailable_dependencies:
-            dependencies_str = ", ".join(str(d) for d in unavailable_dependencies)
-            raise DependencyError("device type %s requires unavailable_dependencies: %s" % (device.type, dependencies_str))
+        # 'unavailable_dependencies' are defined and needed only for devices we
+        # don't need to be able to work with MD or LVM to run wipefs or mkfs on it
+        if self.is_device:
+            unavailable_dependencies = device.unavailable_dependencies
+            if unavailable_dependencies:
+                if device.type == "btrfs volume" and self.is_destroy:
+                    # XXX destroying a btrfs volume is a special case -- we don't destroy
+                    # the device, but use wipefs to destroy format on its parents so we
+                    # don't need btrfs plugin or btrfs-progs for this
+                    pass
+                else:
+                    dependencies_str = ", ".join(str(d) for d in unavailable_dependencies)
+                    raise DependencyError("device type %s requires unavailable_dependencies: %s" % (device.type, dependencies_str))
 
         self.device = device
         self.container = getattr(self.device, "container", None)
