@@ -2,6 +2,8 @@
 import os
 import unittest
 
+import syslog
+
 from blivet import Blivet
 
 
@@ -53,6 +55,7 @@ class VMBackedTestCase(unittest.TestCase):
         # create disk images
         #
         self.set_up_disks()
+        syslog.syslog("set_up_storage started")
 
         #
         # populate the devicetree
@@ -62,6 +65,8 @@ class VMBackedTestCase(unittest.TestCase):
         if self.initialize_disks:
             for disk in self.blivet.disks:
                 self.blivet.initialize_disk(disk)
+
+        syslog.syslog("reset and disk initialzation ended")
 
         #
         # create the rest of the stack
@@ -73,6 +78,8 @@ class VMBackedTestCase(unittest.TestCase):
         #
         self.blivet.do_it()
 
+        syslog.syslog("disk initialized")
+
     def setUp(self):
         """ Do any setup required prior to running a test. """
         self.blivet = Blivet()
@@ -82,6 +89,7 @@ class VMBackedTestCase(unittest.TestCase):
 
     def _clean_up(self):
         """ Clean up any resources that may have been set up for a test. """
+        syslog.syslog("cleanup started")
         self.blivet.reset()
 
         # XXX The only reason for this may be lvmetad
@@ -90,6 +98,7 @@ class VMBackedTestCase(unittest.TestCase):
 
         try:
             self.blivet.do_it()
-        except Exception:
+        except Exception as e:
             self.blivet.reset()
+            syslog.syslog("exception during cleanup: %s", str(e))
             raise

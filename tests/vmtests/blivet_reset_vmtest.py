@@ -9,6 +9,8 @@ from blivet import util
 from blivet.udev import trigger
 from blivet.devices.lvm import LVMLogicalVolumeDevice
 
+import syslog
+
 
 def recursive_getattr(x, attr, default=None):
     """ Resolve a possibly-dot-containing attribute name. """
@@ -110,6 +112,7 @@ class LVMTestCase(BlivetResetTestCase):
     """ Test that the devicetree can populate with the product of autopart. """
 
     def _set_up_storage(self):
+        syslog.syslog("LVMTestCase START")
         # This isn't exactly autopart, but it should be plenty close to it.
         self.blivet.factory_device(devicefactory.DEVICE_TYPE_LVM,
                                    size=Size("500 MiB"),
@@ -118,10 +121,13 @@ class LVMTestCase(BlivetResetTestCase):
         self.blivet.factory_device(devicefactory.DEVICE_TYPE_LVM,
                                    disks=self.blivet.disks[:])
 
+        syslog.syslog("LVMTestCase END")
+
 
 class LVMSnapShotTestCase(BlivetResetTestCase):
 
     def _set_up_storage(self):
+        syslog.syslog("LVMSnapShotTestCase START")
         self.blivet.factory_device(devicefactory.DEVICE_TYPE_LVM,
                                    size=Size("1 GiB"),
                                    label="ROOT",
@@ -140,10 +146,13 @@ class LVMSnapShotTestCase(BlivetResetTestCase):
         self.device_attr_dicts = []
         self.collect_expected_data()
 
+        syslog.syslog("LVMSnapShotTestCase END")
+
 
 class LVMThinpTestCase(BlivetResetTestCase):
 
     def _set_up_storage(self):
+        syslog.syslog("LVMThinpTestCase START")
         self.blivet.factory_device(devicefactory.DEVICE_TYPE_LVM,
                                    size=Size("500 MiB"),
                                    fstype="swap",
@@ -151,11 +160,13 @@ class LVMThinpTestCase(BlivetResetTestCase):
         self.blivet.factory_device(devicefactory.DEVICE_TYPE_LVM_THINP,
                                    label="ROOT",
                                    disks=self.blivet.disks[:])
+        syslog.syslog("LVMThinpTestCase END")
 
 
 class LVMThinSnapShotTestCase(LVMThinpTestCase):
 
     def _set_up_storage(self):
+        syslog.syslog("LVMThinSnapShotTestCase START")
         self.blivet.factory_device(devicefactory.DEVICE_TYPE_LVM_THINP,
                                    size=Size("1 GiB"),
                                    label="ROOT",
@@ -173,86 +184,4 @@ class LVMThinSnapShotTestCase(LVMThinpTestCase):
         self.device_attr_dicts = []
         self.collect_expected_data()
 
-
-class LVMRaidTestCase(BlivetResetTestCase):
-
-    def _set_up_storage(self):
-        # This isn't exactly autopart, but it should be plenty close to it.
-        self.blivet.factory_device(devicefactory.DEVICE_TYPE_LVM,
-                                   size=Size("500 MiB"),
-                                   disks=self.blivet.disks[:],
-                                   container_size=devicefactory.SIZE_POLICY_MAX)
-
-    def setUp(self):
-        super(BlivetResetTestCase, self).setUp()  # pylint: disable=bad-super-call
-        vg_name = self.blivet.vgs[0].name
-        util.run_program(["lvcreate", "-n", "raid", "--type", "raid1",
-                          "-L", "100%", vg_name])
-        self.device_attr_dicts = []
-        self.collect_expected_data()
-
-
-@unittest.skip("temporarily disabled due to issues with raids with metadata version 0.90")
-class MDRaid0TestCase(BlivetResetTestCase):
-
-    """ Verify correct detection of MD RAID0 arrays. """
-    level = "raid0"
-    _validate_attrs = BlivetResetTestCase._validate_attrs + ["level", "spares"]
-
-    def skip_attr(self, device, attr):
-        return (attr in ["name", "path"] and
-                getattr(device, "metadata_version", "").startswith("0.9"))
-
-    def _set_up_storage(self):
-        device = self.blivet.factory_device(devicefactory.DEVICE_TYPE_MD,
-                                            size=Size("200 MiB"),
-                                            disks=self.blivet.disks[:],
-                                            raid_level=self.level,
-                                            label="v090",
-                                            name="2")
-        device.metadata_version = "0.90"
-
-        device = self.blivet.factory_device(devicefactory.DEVICE_TYPE_MD,
-                                            size=Size("200 MiB"),
-                                            disks=self.blivet.disks[:],
-                                            raid_level=self.level,
-                                            label="v1",
-                                            name="one")
-        device.metadata_version = "1.0"
-
-        device = self.blivet.factory_device(devicefactory.DEVICE_TYPE_MD,
-                                            size=Size("200 MiB"),
-                                            disks=self.blivet.disks[:],
-                                            raid_level=self.level,
-                                            label="v11",
-                                            name="oneone")
-        device.metadata_version = "1.1"
-
-        device = self.blivet.factory_device(devicefactory.DEVICE_TYPE_MD,
-                                            size=Size("200 MiB"),
-                                            disks=self.blivet.disks[:],
-                                            raid_level=self.level,
-                                            label="v12",
-                                            name="onetwo")
-        device.metadata_version = "1.2"
-
-        device = self.blivet.factory_device(devicefactory.DEVICE_TYPE_MD,
-                                            size=Size("200 MiB"),
-                                            disks=self.blivet.disks[:],
-                                            raid_level=self.level,
-                                            label="vdefault",
-                                            name="default")
-
-
-class LVMOnMDTestCase(BlivetResetTestCase):
-    # This also tests raid1 with the default metadata version.
-
-    def _set_up_storage(self):
-        self.blivet.factory_device(devicefactory.DEVICE_TYPE_LVM,
-                                   size=Size("200 MiB"),
-                                   disks=self.blivet.disks[:],
-                                   container_raid_level="raid1",
-                                   fstype="swap")
-        self.blivet.factory_device(devicefactory.DEVICE_TYPE_LVM,
-                                   disks=self.blivet.disks[:],
-                                   container_raid_level="raid1")
+        syslog.syslog("LVMThinSnapShotTestCase END")
