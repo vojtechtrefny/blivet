@@ -650,9 +650,12 @@ class ActionCreateFormat(DeviceAction):
                                 get_current_entropy(), min_required_entropy)
                     luks_data.min_entropy = 0
 
-        self.device.setup()
-        self.device.format.create(device=self.device.path,
-                                  options=self.device.format_args)
+        if self.device.type == "stratis_filesystem":
+            self.device.format.exists = True
+        else:
+            self.device.setup()
+            self.device.format.create(device=self.device.path,
+                                      options=self.device.format_args)
 
         # Get the UUID now that the format is created
         udev.settle()
@@ -745,6 +748,10 @@ class ActionDestroyFormat(DeviceAction):
         # remove any flag if set
         super(ActionDestroyFormat, self).execute(callbacks=callbacks)
         status = self.device.status
+
+        if self.device.type == "stratis_filesystem":
+            return
+
         self.device.setup(orig=True)
         if hasattr(self.device, 'set_rw'):
             self.device.set_rw()
