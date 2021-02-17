@@ -100,7 +100,7 @@ def get_new_session_connection():
 
 
 def call_sync(service, obj_path, iface, method, args,
-              connection=None):
+              connection=None, fds=None):
     """
     Safely call a given method on a given object of a given service over DBus
     passing given arguments. If a connection is given, it is used, otherwise a
@@ -136,9 +136,14 @@ def call_sync(service, obj_path, iface, method, args,
         raise DBusCallError("Connection is closed")
 
     try:
-        ret = connection.call_sync(service, obj_path, iface, method, args,
-                                   None, Gio.DBusCallFlags.NONE,
-                                   DEFAULT_DBUS_TIMEOUT, None)
+        if fds:
+            fd_list = Gio.UnixFDList.new_from_array(fds)
+        else:
+            fd_list = None
+
+        ret = connection.call_with_unix_fd_list_sync(service, obj_path, iface, method, args,
+                                                     None, Gio.DBusCallFlags.NONE,
+                                                     DEFAULT_DBUS_TIMEOUT, fd_list, None)
     except GLib.GError as gerr:
         msg = "Failed to call %s method on %s with %s arguments: %s" % \
               (method, obj_path, args, gerr.message)  # pylint: disable=no-member
@@ -148,7 +153,7 @@ def call_sync(service, obj_path, iface, method, args,
         msg = "No return from %s method on %s with %s arguments" % (method, obj_path, args)
         raise DBusCallError(msg)
 
-    return ret.unpack()
+    return ret[0].unpack()
 
 
 def get_property_sync(service, obj_path, iface, prop_name,

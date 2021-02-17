@@ -25,6 +25,8 @@ gi.require_version("GLib", "2.0")
 
 from gi.repository import GLib
 
+import os
+
 from ..errors import StratisError
 from ..size import Size
 from ..static_data import stratis_info
@@ -99,12 +101,52 @@ def remove_filesystem(pool_uuid, fs_uuid):
             raise StratisError("Failed to remove stratis filesystem: %s (%d)" % (err, rc))
 
 
-def create_pool(name, devices):
+def set_key(key_desc, passphrase, key_file):
+    if passphrase:
+        (read, write) = os.pipe()
+        os.write(write, passphrase.encode("utf-8"))
+        fd = read
+    elif key_file:
+        fd = os.open(key_file, os.O_RDONLY)
+
+    import dbus
+    bus = dbus.SystemBus()
+    manager = bus.get_object(STRATIS_SERVICE, STRATIS_PATH)
+    manager.SetKey(key_desc, fd, False, dbus_interface=STRATIS_MANAGER_INTF)
+
+    # try:
+    #     ((kchanged, kset), rc, err) = safe_dbus.call_sync(STRATIS_SERVICE,
+    #                                                       STRATIS_PATH,
+    #                                                       STRATIS_MANAGER_INTF,
+    #                                                       "SetKey",
+    #                                                       GLib.Variant("(shb)", (key_desc, fd, False)), fds=[fd])
+    # except safe_dbus.DBusCallError as e:
+    #     raise StratisError("Failed to set key for new pool: %s" % str(e))
+    # else:
+    #     if rc != 0:
+    #         raise StratisError("Failed to set key for new pool: %s (%d)" % (err, rc))
+    # finally:
+    #     # if key_file:
+    #     #     os.close(fd)
+    #     # if passphrase:
+    #     #     os.close(write)
+    #     pass
+
+def create_pool(name, devices, encrypted, passphrase, key_file):
     if not safe_dbus.check_object_available(STRATIS_SERVICE, STRATIS_PATH):
         raise StratisError("Stratis DBus service not available")
 
+    if encrypted and not (passphrase or key_file):
+        raise StratisError("Passphrase or key file must be specified for encrypted pool")
+
     raid_opt = GLib.Variant("(bq)", (False, 0))
-    key_opt = GLib.Variant("(bs)", (False, ""))
+
+    if encrypted:
+        key_desc = "blivet-%s" % name  # XXX what would be a good key description?
+        set_key(key_desc, passphrase, key_file)
+        key_opt = GLib.Variant("(bs)", (True, key_desc))
+    else:
+        key_opt = GLib.Variant("(bs)", (False, ""))
 
     try:
         ((succ, _paths), rc, err) = safe_dbus.call_sync(STRATIS_SERVICE,
