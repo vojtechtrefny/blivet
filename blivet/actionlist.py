@@ -146,8 +146,14 @@ class ActionList(object):
 
             for obsolete in self._actions[:]:
                 if action.obsoletes(obsolete):
-                    log.info("removing obsolete action %d (%d)",
-                             obsolete.id, action.id)
+                    if obsolete._cancel_obsolete():
+                        obsolete.cancel()
+                        log.info("removing and cancellingy obsolete action %d (%d)",
+                                 obsolete.id, action.id)
+                    else:
+                        log.info("removing obsolete action %d (%d)",
+                                 obsolete.id, action.id)
+
                     self._actions.remove(obsolete)
 
                     if obsolete.obsoletes(action) and action in self._actions:

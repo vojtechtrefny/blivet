@@ -1174,3 +1174,30 @@ class ActionConfigureDevice(DeviceAction):
                       "new_%s" % self.attr: self.new_value,
                       "dry_run": False}
             self._execute(**kwargs)
+
+    @property
+    def _is_rename(self):
+        return self.attr == "name"
+
+    def requires(self, action):
+        """ Return True is self requires action.
+
+            ActionConfigureDevice instances requires other ActionConfigureDevice instances with
+            lower id and same device.
+        """
+        if not self._is_rename:
+            return super(ActionConfigureDevice, self).requires(action)
+
+        return (self.device.id == action.device.id and
+                self.type == action.type and
+                self.obj == action.obj and
+                self.id > action.id)
+
+    def obsoletes(self, action):
+        if self._is_rename:
+            # XXX we would normally obsolete all configure actions on same device, but we currently
+            # support renaming which means we cannot obsolete previous renames, renaming a->b->c
+            # means if we obsolete the a->b rename the b->c rename will fail
+            return tuple()
+
+        return super(ActionConfigureDevice, self).requires(action)
