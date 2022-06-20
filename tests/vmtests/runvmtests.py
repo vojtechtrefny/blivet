@@ -6,14 +6,8 @@ import time
 from contextlib import contextmanager
 
 
-TESTS = ["tests.vmtests.blivet_reset_vmtest.LVMTestCase",
-         "tests.vmtests.blivet_reset_vmtest.LVMSnapShotTestCase",
-         "tests.vmtests.blivet_reset_vmtest.LVMThinpTestCase",
-         "tests.vmtests.blivet_reset_vmtest.LVMThinSnapShotTestCase",
-         "tests.vmtests.blivet_reset_vmtest.LVMRaidTestCase",
-         "tests.vmtests.blivet_reset_vmtest.MDRaid0TestCase",
-         "tests.vmtests.blivet_reset_vmtest.LVMOnMDTestCase",
-         "tests.vmtests.blivet_reset_vmtest.LVMVDOTestCase"]
+TESTS = [
+         "tests.vmtests.blivet_reset_vmtest.StratisTestCase"]
 
 SNAP_NAME = "snapshot"
 
@@ -130,6 +124,15 @@ def run_tests(cmd_args):
                     raise RuntimeError("Failed to switch to brach %s.\nOutput:\n%s\n%s" %
                                        (cmd_args.branch, stdout.read().decode("utf-8"),
                                         stderr.read().decode("utf-8")))
+
+                _stdin, stdout, stderr = ssh.exec_command("sudo dnf -y install stratisd stratis-cli && sudo systemctl start stratisd")
+                out = stdout.read().decode("utf-8")
+                err = stderr.read().decode("utf-8")
+                ret = stdout.channel.recv_exit_status()
+
+                print(out)
+                print(err)
+
 
                 # run the tests
                 cmd = "export VM_ENVIRONMENT=1 && cd blivet && \
