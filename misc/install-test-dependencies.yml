@@ -130,16 +130,24 @@
     package:
       state: present
       name:
-        - python3-blockdev
-        - libblockdev2
-        - libblockdev-plugins-all
-        - gir1.2-blockdev-2.0
         - python3-bytesize
         - python3-mock
         - python3-selinux
         - python3-pyudev
         - python3-parted
         - lvm2-dbusd
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - name: Install latest libblockdev from source (Debian/Ubuntu)
+    shell:  |
+       cd /tmp
+       git clone https://github.com/storaged-project/libblockdev
+       cd libblockdev
+       ansible-playbook -b -i "localhost," -c local misc/install-test-dependencies.yml -e "test_dependencies=false"
+       ./autogen.sh
+       ./configure --prefix=/usr --without-nvme
+       make
+       sudo make install
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
   - name: Install test dependencies (Debian/Ubuntu)
