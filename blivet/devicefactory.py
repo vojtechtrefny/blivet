@@ -1298,6 +1298,7 @@ class PartitionSetFactory(PartitionFactory):
         # Determine target container size.
         ##
         total_space = self.parent_factory._get_total_space()
+        log.debug("AAAAA total_space: %s", total_space)
 
         ##
         # Set up SizeSet to manage growth of member partitions.
@@ -1314,6 +1315,9 @@ class PartitionSetFactory(PartitionFactory):
         # Allocate the member partitions.
         ##
         self._post_create()
+
+        if self.parent_factory.container:
+            log.debug("AAAAAA self.container.size: %s, self.container.free_space: %s", self.parent_factory.container.size, self.parent_factory.container.free_space)
 
 
 class LVMFactory(DeviceFactory):
@@ -1364,7 +1368,10 @@ class LVMFactory(DeviceFactory):
 
     def _get_device_space(self):
         """ The total disk space required for the factory device (LV). """
-        return blockdev.lvm.get_lv_physical_size(self.size, self._pe_size)
+        physical_size = blockdev.lvm.get_lv_physical_size(self.size, self._pe_size)
+        log.debug("self.size is %s, self._pe_size is %s", self.size, self._pe_size)
+        log.debug("device space according to device factory: %s", physical_size)
+        return physical_size
 
     def _get_device_size(self):
         """ Return the factory device size including container limitations. """
@@ -1410,16 +1417,25 @@ class LVMFactory(DeviceFactory):
             # automatic container size management
             if self.vg:
                 space += sum(p.size for p in self.vg.parents)
+                log.debug("BBBB 1 space is now %s", space)
                 space -= self.vg.free_space
+                log.debug("BBBB 2 space is now %s (deducted %s free space)", space, self.vg.free_space)
                 # we need to account for the LVM metadata being placed somewhere
                 space += self.vg.lvm_metadata_space
+                log.debug("BBBB 3 space is now %s (added %s metadata space)", space, self.vg.lvm_metadata_space)
+                # XXX fix???
+                space += sum(p.size - self.vg._get_pv_usable_space(p) for p in self.vg.parents)
+                log.debug("BBBB 4 space is now %s (added %s unusable PV space)", space, sum(p.size - self.vg._get_pv_usable_space(p) for p in self.vg.parents))
             else:
                 # we need to account for the LVM metadata being placed on each disk
                 # (and thus taking up to one extent from each disk)
                 space += len(self.disks) * self._pe_size
 
             space += self._get_device_space()
+            log.debug("BBBB 4 space is now %s (added %s device space)", space, self._get_device_space())
             log.debug("size bumped to %s to include new device space", space)
+            if self.vg:
+                log.debug("%s: vg size is now %s, vg free space is now %s", self.vg.name, self.vg.size, self.vg.free_space)
             if self.device:
                 space -= blockdev.lvm.round_size_to_pe(self.device.size, self._pe_size)
                 log.debug("size cut to %s to omit old device space", space)

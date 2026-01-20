@@ -554,6 +554,7 @@ class LVMVolumeGroupDevice(ContainerDevice):
     def size(self):
         """ The size of this VG """
         # TODO: just ask lvm if isModified returns False
+        log.debug("%s size is %s", self.name, sum(self._get_pv_usable_space(pv) for pv in self.pvs))
         return sum(self._get_pv_usable_space(pv) for pv in self.pvs)
 
     @property
@@ -569,11 +570,15 @@ class LVMVolumeGroupDevice(ContainerDevice):
         # TODO: just ask lvm if is_modified returns False
 
         # total the sizes of any LVs
-        log.debug("%s size is %s", self.name, self.size)
+        log.debug("%s size is %s (%s)", self.name, self.size, self.size.convert_to())
+        for lv in self.lvs:
+            log.debug("%s LV size is %s (%s), space used is %s (%s)", lv.name, lv.size, lv.size.convert_to(), lv.vg_space_used, lv.vg_space_used.convert_to())
         used = sum((lv.vg_space_used for lv in self.lvs), Size(0))
+        log.debug("%s used is %s (%s)", self.name, used, used.convert_to())
         used += self.reserved_space
+        log.debug("%s reserved space is %s", self.name, self.reserved_space)
         free = self.size - used
-        log.debug("vg %s has %s free", self.name, free)
+        log.debug("vg %s has %s (%s) free", self.name, free, free.convert_to())
         return free
 
     @property
@@ -954,6 +959,7 @@ class LVMLogicalVolumeBase(DMDevice, RaidDevice):
             cache_size = Size(0)
 
         rounded_size = self.vg.align(self.size, roundup=True)
+        log.debug("data space used rounded from %s to %s", self.size, rounded_size)
         if self.is_raid_lv:
             zero_superblock = lambda x: Size(0)
             try:
