@@ -361,6 +361,14 @@ class DeviceFactory(object):
             :type pbkdf_args: :class:`~.formats.luks.LUKS2PBKDFArgs`
             :keyword luks_sector_size: encryption sector size (use only with LUKS version 2)
             :type luks_sector_size: int
+            :keyword cipher: LUKS cipher (paes-xts-plain64 requests pervasive encryption)
+            :keyword key_size: LUKS key size in bits
+            :keyword zkey_key_type: PAES secure-key type
+            :keyword zkey_apqns: PAES crypto adapters
+            :keyword zkey_keybits: PAES clear-key size in bits
+            :keyword zkey_sector_size: PAES sector size
+            :keyword zkey_dummy_passphrase: generate a repository dummy passphrase
+            :keyword zkey_name: PAES repository key name
 
         """
         self.storage = storage  # a Blivet instance
@@ -382,6 +390,8 @@ class DeviceFactory(object):
         self.luks_version = kwargs.get("luks_version") or crypto.DEFAULT_LUKS_VERSION
         self.pbkdf_args = kwargs.get("pbkdf_args", None)
         self.luks_sector_size = kwargs.get("luks_sector_size") or 0
+        self._luks_extra_args = {key: kwargs[key] for key in ("cipher", "key_size") + crypto.ZKEY_PARAMETERS
+                                 if key in kwargs}
 
         # If a device was passed, update the defaults based on it.
         self.device = kwargs.get("device")
@@ -769,6 +779,7 @@ class DeviceFactory(object):
             fmt_args["luks_version"] = self.luks_version
             fmt_args["pbkdf_args"] = self.pbkdf_args
             fmt_args["luks_sector_size"] = self.luks_sector_size
+            fmt_args.update(self._luks_extra_args)
         else:
             fstype = self.fstype
             mountpoint = self.mountpoint
@@ -908,7 +919,8 @@ class DeviceFactory(object):
                                                                min_luks_entropy=self.min_luks_entropy,
                                                                luks_version=self.luks_version,
                                                                pbkdf_args=self.pbkdf_args,
-                                                               luks_sector_size=self.luks_sector_size))
+                                                               luks_sector_size=self.luks_sector_size,
+                                                               **self._luks_extra_args))
             luks_device = LUKSDevice("luks-%s" % self.device.name,
                                      fmt=leaf_format,
                                      parents=self.device)
@@ -960,7 +972,8 @@ class DeviceFactory(object):
         return {"storage": self.storage,
                 "size": self._get_total_space(),
                 "disks": self.disks,
-                "fstype": self.child_factory_fstype}
+                "fstype": self.child_factory_fstype,
+                **self._luks_extra_args}
 
     def _set_up_child_factory(self):
         if self.child_factory or not self.child_factory_class or \
@@ -1264,7 +1277,8 @@ class PartitionSetFactory(PartitionFactory):
                                                               min_luks_entropy=self.min_luks_entropy,
                                                               luks_version=self.luks_version,
                                                               pbkdf_args=self.pbkdf_args,
-                                                              luks_sector_size=self.luks_sector_size))
+                                                              luks_sector_size=self.luks_sector_size,
+                                                              **self._luks_extra_args))
                 luks_member = LUKSDevice("luks-%s" % member.name,
                                          parents=[member],
                                          fmt=get_format(self.fstype))
@@ -1304,6 +1318,7 @@ class PartitionSetFactory(PartitionFactory):
                 fmt_args["luks_version"] = self.luks_version
                 fmt_args["pbkdf_args"] = self.pbkdf_args
                 fmt_args["luks_sector_size"] = self.luks_sector_size
+                fmt_args.update(self._luks_extra_args)
             else:
                 member_format = self.fstype
 

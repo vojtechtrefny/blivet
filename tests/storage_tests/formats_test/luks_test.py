@@ -1,4 +1,5 @@
 import os
+import glob
 import tempfile
 import unittest
 
@@ -7,6 +8,8 @@ from blivet.formats.luks import LUKS, Integrity
 from blivet.devicelibs import crypto
 from blivet.errors import LUKSError
 from blivet.size import Size
+from blivet import arch
+from blivet.tasks import availability
 import blivet.static_data
 
 from . import loopbackedtestcase
@@ -155,6 +158,39 @@ class LUKSTestCaseLUKS2(LUKSTestCase):
 
 # prevent unittest from running the "abstract" test case
 del LUKSTestCase
+
+
+@unittest.skipUnless(arch.is_s390() and availability.BLOCKDEV_S390_PLUGIN_PAES.available and
+                     os.path.exists("/dev/pkey") and glob.glob("/sys/bus/ap/devices/card*/*.*"),
+                     "requires IBM Z with PAES support and crypto adapters")
+class PAESLUKSTestCase(loopbackedtestcase.LoopBackedTestCase):
+    def __init__(self, methodName="run_test"):
+        super().__init__(methodName=methodName, device_spec=[Size("100 MiB")])
+
+    def test_create_discover_destroy(self):
+        fmt = LUKS(device=self.loop_devices[0], cipher=crypto.PAES_CIPHER, passphrase="paes-test-password")
+
+        def cleanup():
+            if fmt.exists:
+                fmt.teardown()
+                fmt.destroy()
+            elif fmt._zkey_name:
+                crypto.remove_secure_key(fmt._zkey_name)
+
+        self.addCleanup(cleanup)
+        fmt.create()
+        self.assertTrue(fmt.pervasive)
+        self.assertEqual(fmt.luks_version, "luks2")
+        info = crypto.find_secure_key_for_volume(fmt.device)
+        self.assertIsNotNone(info)
+        self.assertEqual(fmt.key_size, info.secure_key_size * 8)
+        fmt.setup()
+        self.assertTrue(fmt.status)
+        fmt.teardown()
+        # Exercise repository lookup for a format discovered without cached metadata.
+        fmt._zkey_name = None
+        fmt.destroy()
+        self.assertIsNone(crypto.find_secure_key_for_volume(fmt.device))
 
 
 class LUKSContextTestCase(loopbackedtestcase.LoopBackedTestCase):

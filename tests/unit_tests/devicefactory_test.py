@@ -332,6 +332,25 @@ class DeviceFactoryTestCase(unittest.TestCase):
 
 
 class PartitionFactoryTestCase(DeviceFactoryTestCase):
+    @patch("blivet.formats.luks.arch")
+    @patch("blivet.formats.luks.availability.BLOCKDEV_S390_PLUGIN_PAES", available=True)
+    @patch("blivet.devices.dm.DMDevice.type_external_dependencies", return_value=set())
+    def test_paes_parameters(self, *args):  # pylint: disable=unused-argument
+        device = self._factory_device(self.device_type, disks=self.b.disks, size=Size("400 MiB"),
+                                      fstype="ext4", encrypted=True, cipher=crypto.PAES_CIPHER,
+                                      zkey_keybits=256, zkey_key_type="CCA-AESCIPHER",
+                                      zkey_apqns=["01.0001"], zkey_sector_size=4096,
+                                      zkey_dummy_passphrase=True, zkey_name="test-key")
+        fmt = device.raw_device.format
+        self.assertTrue(fmt.pervasive)
+        self.assertEqual(fmt.key_size, 0)
+        self.assertEqual(fmt.zkey_keybits, 256)
+        self.assertEqual(fmt.zkey_key_type, "CCA-AESCIPHER")
+        self.assertEqual(fmt.zkey_apqns, ["01.0001"])
+        self.assertEqual(fmt.zkey_sector_size, 4096)
+        self.assertTrue(fmt.zkey_dummy_passphrase)
+        self.assertEqual(fmt._zkey_name, "test-key")
+
     device_class = PartitionDevice
     device_type = devicefactory.DeviceTypes.PARTITION
     factory_class = devicefactory.PartitionFactory

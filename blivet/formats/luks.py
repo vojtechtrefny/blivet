@@ -23,7 +23,7 @@
 import gi
 gi.require_version("BlockDev", "3.0")
 
-from gi.repository import BlockDev as blockdev
+from gi.repository import BlockDev as blockdev, GLib
 
 import os
 
@@ -36,7 +36,7 @@ from ..i18n import _, N_
 from ..tasks import availability, lukstasks
 from ..size import Size, KiB
 from ..static_data import encryption_data
-from .. import udev
+from .. import arch, udev
 
 import logging
 log = logging.getLogger("blivet")
@@ -104,6 +104,12 @@ class LUKS(DeviceFormat):
             :type subsystem: str
             :keyword opal_admin_passphrase: OPAL admin passphrase
             :type opal_admin_passphrase: str
+            :keyword zkey_key_type: secure-key type (None uses the zkey default)
+            :keyword zkey_apqns: list of crypto adapters in card.domain notation
+            :keyword zkey_keybits: clear-key size in bits (0 uses the zkey default)
+            :keyword zkey_sector_size: PAES sector size (0 uses the zkey default)
+            :keyword zkey_dummy_passphrase: generate a repository dummy passphrase
+            :keyword zkey_name: repository key name (must not already exist)
 
             .. note::
 
@@ -143,6 +149,22 @@ class LUKS(DeviceFormat):
         self.subsystem = kwargs.get("subsystem") or None
 
         self.is_opal = self.luks_version in crypto.OPAL_TYPES.keys()
+        self.pervasive = crypto.is_paes_cipher(self.cipher)
+        self.zkey_key_type = kwargs.get("zkey_key_type")
+        self.zkey_apqns = kwargs.get("zkey_apqns")
+        self.zkey_keybits = kwargs.get("zkey_keybits") or 0
+        self.zkey_sector_size = kwargs.get("zkey_sector_size") or 0
+        self.zkey_dummy_passphrase = kwargs.get("zkey_dummy_passphrase", False)
+        self._zkey_name = kwargs.get("zkey_name")
+
+        if self.pervasive and not self.exists:
+            if self.luks_version != "luks2" or self.is_opal:
+                raise LUKSError("Pervasive encryption requires LUKS2 without OPAL")
+            if not arch.is_s390():
+                raise LUKSError("Pervasive encryption requires IBM Z")
+            if not availability.BLOCKDEV_S390_PLUGIN_PAES.available:
+                raise LUKSError("Pervasive encryption is not available: %s" %
+                                ",".join(availability.BLOCKDEV_S390_PLUGIN_PAES.availability_errors))
 
         if self.luks_version.startswith("luks2"):
             self._header_size = crypto.LUKS2_METADATA_SIZE
@@ -156,7 +178,7 @@ class LUKS(DeviceFormat):
         if not self.exists:
             if not self.cipher:
                 self.cipher = "aes-xts-plain64"
-            if not self.key_size and "xts" in self.cipher:
+            if not self.key_size and "xts" in self.cipher and not self.pervasive:
                 # default to the max (512 bits) for xts
                 self.key_size = 512
 
@@ -375,6 +397,27 @@ class LUKS(DeviceFormat):
             raise LUKSError("HW-OPAL LUKS devices cannot be destroyed.")
         return super(LUKS, self)._pre_destroy()
 
+    def _post_destroy(self, **kwargs):
+        # Keep the repository key if wiping the volume failed.
+        super(LUKS, self)._post_destroy(**kwargs)
+        if self.pervasive:
+            try:
+                # Re-read associations even for a cached key: it may have been
+                # shared with other volumes since this format was discovered.
+                info = crypto.find_secure_key_for_volume(self.device)
+                if info:
+                    other_volumes = [volume for volume in info.volumes or []
+                                     if os.path.realpath(volume.split(":", 1)[0]) != os.path.realpath(self.device)]
+                    if other_volumes:
+                        log.warning("Keeping shared secure key %s after destroying %s; "
+                                    "it is still associated with other volumes: %s",
+                                    info.name, self.device, ", ".join(other_volumes))
+                        return
+                    crypto.remove_secure_key(info.name)
+                    self._zkey_name = None
+            except (blockdev.BlockDevError, GLib.Error, OSError, AttributeError) as e:
+                log.warning("Failed to remove secure key for %s: %s", self.device, e)
+
     def _pre_resize(self):
         if self.luks_version == "luks2" and not self.has_key:
             raise LUKSError("Passphrase or key needs to be set before resizing LUKS2 format.")
@@ -386,7 +429,10 @@ class LUKS(DeviceFormat):
 
     def _pre_create(self, **kwargs):
         super(LUKS, self)._pre_create(**kwargs)
-        self.map_name = None
+        if not self.pervasive:
+            self.map_name = None
+        elif not self.map_name:
+            self.map_name = "luks-%s" % os.path.basename(self.device)
         if not self.has_key:
             raise LUKSError("luks device has no key/passphrase")
 
@@ -395,6 +441,26 @@ class LUKS(DeviceFormat):
                         type=self.type, status=self.status)
         super(LUKS, self)._create(**kwargs)  # set up the event sync
 
+        original_zkey_name = self._zkey_name
+        volume_key = None
+        if self.pervasive:
+            volume_key = self._prepare_secure_key()
+
+        try:
+            self._create_luks(volume_key)
+        except Exception:
+            # Preparation succeeded, so this key belongs to the failed attempt.
+            # Do not leave its volume association blocking a subsequent create.
+            if volume_key is not None:
+                try:
+                    crypto.remove_secure_key(self._zkey_name)
+                    self._zkey_name = original_zkey_name
+                except (blockdev.BlockDevError, GLib.Error, OSError, AttributeError) as e:
+                    log.warning("Failed to remove secure key %s after LUKS creation failed: %s", self._zkey_name, e)
+            raise
+
+    def _create_luks(self, volume_key=None):
+        """Format the volume, add keyslots, and initialize PAES verification."""
         if not self.pbkdf_args and self.luks_version.startswith("luks2"):
             if encryption_data.pbkdf_args:
                 self.pbkdf_args = encryption_data.pbkdf_args
@@ -407,7 +473,7 @@ class LUKS(DeviceFormat):
                         encryption_data.pbkdf_args = self.pbkdf_args
                         log.info("PBKDF arguments for LUKS2 not specified, using defaults with memory limit %s", mem_limit)
 
-        if not self.luks_sector_size and self.luks_version.startswith("luks2"):
+        if not self.pervasive and not self.luks_sector_size and self.luks_version.startswith("luks2"):
             self.luks_sector_size = crypto.get_optimal_luks_sector_size(self.device)
 
         if self.pbkdf_args:
@@ -433,6 +499,8 @@ class LUKS(DeviceFormat):
 
         # sort contexts by priority and use the highest priority for format
         context = self.contexts.get_context()
+        if self.pervasive:
+            context = self.contexts.get_context("passphrase")
 
         if self.is_opal:
             if not self.__opal_admin_passphrase:
@@ -440,7 +508,16 @@ class LUKS(DeviceFormat):
             opal_context = blockdev.CryptoKeyslotContext(passphrase=self.__opal_admin_passphrase)
 
         try:
-            if self.is_opal:
+            if self.pervasive:
+                blockdev.crypto.luks_format_volume_key(self.device,
+                                                       context=context._context,
+                                                       volume_key=volume_key._context,
+                                                       cipher=self.cipher,
+                                                       key_size=self.key_size,
+                                                       min_entropy=self.min_luks_entropy,
+                                                       luks_version=crypto.LUKS_VERSIONS[self.luks_version],
+                                                       extra=extra)
+            elif self.is_opal:
                 blockdev.crypto.opal_format(self.device,
                                             context=context._context,
                                             cipher=self.cipher if self.luks_version == "luks2-hw-opal" else None,
@@ -471,6 +548,53 @@ class LUKS(DeviceFormat):
                     blockdev.crypto.luks_add_key(self.device, context._context, cxt._context)
                 except blockdev.CryptoError as e:
                     raise LUKSError(e)
+
+        if self.pervasive:
+            try:
+                crypto.set_verification_pattern(self.device, self.contexts.get_context("passphrase")._passphrase)
+            except (blockdev.BlockDevError, GLib.Error, OSError) as e:
+                raise LUKSError("Failed to set PAES verification pattern: %s" % e)
+
+    def _prepare_secure_key(self):
+        """Generate a new repository key; never reuse or overwrite existing keys."""
+        if not self.contexts.get_context("passphrase"):
+            raise LUKSError("Pervasive encryption creation requires a passphrase")
+        try:
+            keys = blockdev.s390.zkey_list(None)
+            if crypto.find_secure_key_for_volume(self.device):
+                raise LUKSError("A secure key is already associated with %s" % self.device)
+            names = {key.name for key in keys}
+            name = self._zkey_name
+            if name and name in names:
+                raise LUKSError("Secure key '%s' already exists" % name)
+            if not name:
+                base = "blivet-%s" % os.path.basename(self.device)
+                name = base
+                suffix = 1
+                while name in names:
+                    name = "%s-%d" % (base, suffix)
+                    suffix += 1
+            info = crypto.generate_secure_key(name, self.zkey_key_type, self.zkey_keybits,
+                                              ["%s:%s" % (self.device, self.map_name)], self.zkey_apqns,
+                                              self.zkey_sector_size, self.zkey_dummy_passphrase)
+            self._zkey_name = info.name
+            try:
+                key = crypto.read_secure_key(info.key_file_name)
+                if not key or len(key) != info.secure_key_size:
+                    raise LUKSError("Secure-key size does not match repository metadata")
+                context = crypto.KeyslotContext(volume_key=key)
+            except (OSError, ValueError, blockdev.BlockDevError, GLib.Error, LUKSError):
+                try:
+                    crypto.remove_secure_key(self._zkey_name)
+                    self._zkey_name = None
+                except (blockdev.BlockDevError, GLib.Error) as e:
+                    log.warning("Failed to remove secure key %s: %s", self._zkey_name, e)
+                raise
+            self.key_size = info.secure_key_size * 8
+            self.luks_sector_size = info.sector_size
+            return context
+        except (blockdev.BlockDevError, GLib.Error, OSError, ValueError) as e:
+            raise LUKSError("Failed to prepare PAES secure key: %s" % e)
 
     def _post_create(self, **kwargs):
         super(LUKS, self)._post_create(**kwargs)
